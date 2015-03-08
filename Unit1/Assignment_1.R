@@ -1,5 +1,4 @@
 mvt = read.csv("mvtWeek1.csv")
-attach(mvt)
 nrow(mvt)
 names(mvt)
 str(mvt)
@@ -15,6 +14,7 @@ summary(DateConvert)
 mvt$Month = months(DateConvert)
 mvt$Weekday = weekdays(DateConvert)
 mvt$Date = DateConvert
+attach(mvt)
 table(mvt$Month)
 which.min(table(mvt$Month))
 which.max(table(mvt$Weekday))
