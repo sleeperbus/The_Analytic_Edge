@@ -28,6 +28,6 @@ plot(CocaCola$Date[301:432], CocaCola$StockPrice[301:432], type="l",
 lines(IBM$Date[301:432], IBM$StockPrice[301:432], col="black")
 lines(GE$Date[301:432], GE$StockPrice[301:432], col="blue")
 lines(Boeing$Date[301:432], Boeing$StockPrice[301:432], col="purple")
-lines(ProcterGamble$Date[301:432], ProtectGamle$StockPrice[301:432], col="green")
+lines(ProcterGamble$Date[301:432], ProcterGamble$StockPrice[301:432], col="green")
 
 
