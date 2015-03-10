@@ -30,5 +30,9 @@ sort(tapply(CPS$Education == "No high school diploma",
 CPS = merge(CPS, CountryMap, by.x="CountryOfBirthCode", by.y="Code", all.x=TRUE)
 names(CPS)
 summary(CPS)
-sort(table(CPS$Country))
 
+tapply(CPS$Country != "United States", CPS$MetroArea, mean, na.rm=TRUE)
+table(CPS$MetroArea == "New York-Northern New Jersey-Long Island, NY-NJ-PA", 
+    CPS$Country != "United States")
+
+sort(tapply(CPS$Country == "Somalia", CPS$MetroArea, sum, na.rm=TRUE))
