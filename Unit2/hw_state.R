@@ -22,3 +22,7 @@ plot(statedata$Income, statedata$Life.Exp)
 lm.life2 = lm(Life.Exp ~ Population + Murder + HS.Grad + Frost, 
               data=statedata)
 summary(lm.life2)
+sort(predict(lm.life2))
+statedata[which.min(statedata$Life.Exp), ]
+statedata[which.max(statedata$Life.Exp), ]
+sort(abs(lm.life2$residuals))
