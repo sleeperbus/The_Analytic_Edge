@@ -56,6 +56,11 @@ prop.table(table(test$Reverse, forest.pred))
 library(caret)
 library(e1071)
 
-numFolds = trainControl(method="cv", number=10)
-cpGrid = expand.grid(.cp = seq(0.1, 0.5, 0.01))
-train(form, data=train, method="rpart", trControl=numFolds, tuneGrid=cpGrid) 
+numFold = trainControl(method="cv", number=10)
+cpGrid = expand.grid(.cp=seq(0.1,0.5,0.01))
+train(form, data=train, method="rpart", trControl=numFold, tuneGrid=cpGrid)
+# best cp is 0.18
+
+cv.mod = rpart(form, data=train, method="class", cp=0.18)
+cv.pred = predict(cv.mod, newdata=test, type="class")
+table(test$Reverse, cv.pred)
