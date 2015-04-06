@@ -1,6 +1,5 @@
 library(caTools)
 library(ROCR)
-library(caret)
 
 set.seed(3000)
 stevens = read.csv("stevens.csv")
@@ -52,4 +51,11 @@ test$Reverse = as.factor(test$Reverse)
 forest.mod = randomForest(form, data=train, ntree=200, nodesize=25)
 forest.pred = predict(forest.mod, newdata=test)
 prop.table(table(test$Reverse, forest.pred))
-           
+
+# cross validation
+library(caret)
+library(e1071)
+
+numFolds = trainControl(method="cv", number=10)
+cpGrid = expand.grid(.cp = seq(0.1, 0.5, 0.01))
+train(form, data=train, method="rpart", trControl=numFolds, tuneGrid=cpGrid) 
