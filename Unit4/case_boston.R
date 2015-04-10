@@ -1,5 +1,6 @@
 boston = read.csv("boston.csv")
 str(boston)
+summary(boston)
 formula = MEDV ~ LON + LAT + CRIM + ZN + INDUS + CHAS + NOX + RM +
     AGE + DIS + RAD + TAX + PTRATIO
 
