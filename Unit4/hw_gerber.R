@@ -36,3 +36,18 @@ cart.mod3 = rpart(voting ~ hawthorne + civicduty + neighbors + self + sex,
                   data=gerber, cp=0.0)
 prp(cart.mod3)
 
+
+cart.control = rpart(voting ~ control, data=gerber, cp=0.0)
+cart.sex = rpart(voting ~ control + sex, data=gerber, cp=0.0)
+prp(cart.control, digit=6)
+prp(cart.sex, digit=6)
+
+log.sex = glm(voting ~ sex + control, data=gerber, family=binomial)
+summary(log.sex)
+possibilities = data.frame(sex=c(0,0,1,1), control=c(0,1,0,1))
+predict(log.sex, newdata=possibilities, type="response")
+
+log.mod2 = glm(voting ~ sex + control + sex:control, data=gerber, family=binomial)
+summary(log.mod2)
+
+predict(log.mod2, newdata=possibilities, type="response")
