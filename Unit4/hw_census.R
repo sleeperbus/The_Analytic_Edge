@@ -38,3 +38,37 @@ cart.pred = predict(cart.mod, newdata=test)
 cart.prediction = prediction(cart.pred[,2], test$over50k)
 cart.perf = performance(cart.prediction, "tpr", "fpr")
 plot(cart.perf, print.cutoffs.at=seq(0,1,0.1), colorize=T, text.adj=c(0,1.7))
+cart.auc = performance(cart.prediction, "auc")
+cart.auc
+
+# random forest 
+library(randomForest)
+set.seed(1)
+train.small = train[sample(nrow(train), 2000),]
+set.seed(1)
+forest.mod = randomForest(over50k ~ ., data=train.small)
+forest.pred = predict(forest.mod, newdata=test)
+forest.table = table(test$over50k, forest.pred)
+forest.table
+sum(diag(1,2)*forest.table)/sum(forest.table)
+
+vu = varUsed(forest.mod, count = TRUE)
+vusorted = sort(vu, decreasing=F, index.return=T)
+dotchart(vusorted$x, names(forest.mod$forest$xlevels[vusorted$ix]))
+
+varImpPlot(forest.mod)
+
+# Cross Validation
+library(caret)
+library(e1071)
+trCont = trainControl(method="cv", number=10)
+cartGrid = expand.grid(.cp=seq(0.002, 0.1, 0.002))
+train(over50k ~ ., data=train, method="rpart", trainControl=trCont,
+    tuneGrid=cartGrid)
+
+# CART using cp
+cart.cp.mod = rpart(over50k ~ ., data=train, method="class", cp=0.002)
+cart.cp.pred = predict(cart.cp.mod, newdata=test, type="class")
+cart.cp.table = table(test$over50k, cart.cp.pred)
+sum(diag(1,2)*cart.cp.table)/sum(cart.cp.table)
+prp(cart.cp.mod)
