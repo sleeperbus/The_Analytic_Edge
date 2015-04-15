@@ -21,3 +21,19 @@ sparse = removeSparseTerms(frequencies, 0.995)
 tweetSparse = as.data.frame(as.matrix(sparse))
 tweetSparse$Negative = tweets$Negative
 
+library(caTools)
+set.seed(123)
+split = sample.split(tweetSparse$Negative, SplitRatio = 0.7)
+train = subset(tweetSparse, split==T)
+test = subset(tweetSparse, split==F)
+
+# CART model
+cart.mod = rpart(Negative ~ ., data=train, method="class")
+prp(cart.mod)
+cart.pred = predict(cart.mod, newdata=test, type="class")
+cart.table = table(test$Negative, cart.pred)
+sum(diag(1,2)*cart.table)/sum(cart.table)
+
+# base line
+300/(300+55)
+
