@@ -49,3 +49,12 @@ forest.table = table(test$Negative, forest.pred)
 forest.table
 sum(diag(1,2)*forest.table)/sum(forest.table)
 
+# Linear regression model
+lig.mod = glm(Negative ~ .,data=train, family="binomial")
+lig.pred = predict(lig.mod, newdata=test, type="response")
+lig.table = table(test$Negative, lig.pred > 0.5)
+sum(diag(1,2)*lig.table)/sum(lig.table)
+library(ROCR)
+lig.prediction = prediction(lig.pred, test$Negative)
+lig.performance = performance(lig.prediction, "tpr", "fpr")
+plot(lig.performance, print.cutoffs.at=seq(0,1,0.1), text.adj=c(0,1.7))
