@@ -57,4 +57,5 @@ sum(diag(1,2)*lig.table)/sum(lig.table)
 library(ROCR)
 lig.prediction = prediction(lig.pred, test$Negative)
 lig.performance = performance(lig.prediction, "tpr", "fpr")
-plot(lig.performance, print.cutoffs.at=seq(0,1,0.1), text.adj=c(0,1.7))
+plot(lig.performance, print.cutoffs.at=seq(0,1,0.1), text.adj=c(0,1.7),
+     colorize=T)
