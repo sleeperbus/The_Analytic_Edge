@@ -58,3 +58,25 @@ sum(diag(1,2)*cart.table2)/sum(cart.table2)
 
 wikiWords2$NumWordsAdded = rowSums(as.matrix(dtmAdded))
 wikiWords2$NumWordsRemoved= rowSums(as.matrix(dtmRemoved))
+summary(wikiWords2$NumWordsAdded)
+
+train3 = subset(wikiWords2, split==T)
+test3 = subset(wikiWords2, split==F)
+
+cart.mod3 = rpart(Vandal ~., data=train3, method="class")
+prp(cart.mod3)
+cart.pred3 = predict(cart.mod3, newdata=test3, type="class")
+cart.table3 = table(test3$Vandal, cart.pred3)
+sum(diag(1,2)*cart.table3)/sum(cart.table3)
+
+wikiWords3 = wikiWords2
+wikiWords3$Minor = wiki$Minor
+wikiWords3$Loggedin = wiki$Loggedin
+
+train4 = subset(wikiWords3, split==T)
+test4 = subset(wikiWords3, split==F)
+cart.mod4 = rpart(Vandal ~., data=train4, method="class")
+prp(cart.mod4)
+cart.pred4 = predict(cart.mod4, newdata=test4, type="class")
+cart.table4 = table(test4$Vandal, cart.pred4)
+sum(diag(1,2)*cart.table4)/sum(cart.table4)
