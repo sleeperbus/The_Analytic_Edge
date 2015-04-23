@@ -22,4 +22,66 @@ sort(colSums(emailSparse))
 emailSparse$spam = emails$spam
 
 sort(colSums(subset(emailSparse, spam==0)))
-sort(colSums(subset(emailSparse, spam==1)))
+sort(colSums(subset(emailSparse, spam==1))) 
+
+emailSparse$spam = as.factor(emailSparse$spam)
+
+library(caTools)
+set.seed(123)
+split = sample.split(emailSparse$spam, SplitRatio=0.7)
+train = subset(emailSparse, split==T)
+test = subset(emailSparse, split==F)
+
+# Logistic Regression
+spamLog = glm(spam ~., data=train, family=binomial)
+summary(spamLog)
+
+# CART model
+library(rpart)
+library(rpart.plot)
+spamCART = rpart(spam ~., data=train, method="class")
+prp(spamCART)
+
+# Random Forest Model
+library(randomForest)
+set.seed(123)
+spamRF = randomForest(spam ~ ., data=train)
+
+# train set occuracy
+predTrainLog = predict(spamLog, type="response")
+predTrainCART = predict(spamCART)[,2]
+predTrainRF = predict(spamRF, type="prob")[,2]
+
+tableTrainLog = table(train$spam, predTrainLog > 0.5)
+sum(diag(1,2)*tableTrainLog)/sum(tableTrainLog)
+tableTrainCART = table(train$spam, predTrainCART > 0.5)
+sum(diag(1,2)*tableTrainCART)/sum(tableTrainCART)
+tableTrainRF= table(train$spam, predTrainRF> 0.5)
+sum(diag(1,2)*tableTrainRF)/sum(tableTrainRF)
+
+library(ROCR)
+predictionTrainLog = prediction(predTrainLog, train$spam)
+aucTrainLog = performance(predictionTrainLog, "auc")@y.values
+predictionTrainCART = prediction(predTrainCART, train$spam)
+aucTrainCART = performance(predictionTrainCART, "auc")@y.values
+predictionTrainRF= prediction(predTrainRF, train$spam)
+aucTrainRF= performance(predictionTrainRF, "auc")@y.values
+
+# Test set occuracy
+predTestLog = predict(spamLog, newdata=test, type="response")
+predTestCART = predict(spamCART, newdata=test)[,2]
+predTestRF = predict(spamRF, newdata=test, type="prob")[,2]
+
+tableTestLog = table(test$spam, predTestLog > 0.5)
+sum(diag(1,2)*tableTestLog)/sum(tableTestLog)
+tableTestCART = table(test$spam, predTestCART > 0.5)
+sum(diag(1,2)*tableTestCART)/sum(tableTestCART)
+tableTestRF= table(test$spam, predTestRF> 0.5)
+sum(diag(1,2)*tableTestRF)/sum(tableTestRF)
+
+predictionTestLog = prediction(predTestLog, test$spam)
+aucTestLog = performance(predictionTestLog, "auc")@y.values
+predictionTestCART = prediction(predTestCART, test$spam)
+aucTestCART = performance(predictionTestCART, "auc")@y.values
+predictionTestRF= prediction(predTestRF, test$spam)
+aucTestRF= performance(predictionTestRF, "auc")@y.values
