@@ -85,3 +85,28 @@ predictionTestCART = prediction(predTestCART, test$spam)
 aucTestCART = performance(predictionTestCART, "auc")@y.values
 predictionTestRF= prediction(predTestRF, test$spam)
 aucTestRF= performance(predictionTestRF, "auc")@y.values
+
+library(slam)
+wordCount = rollup(dtm, 2, FUN=sum)$v
+
+emailSparse$logWordCount = log(wordCount)
+boxplot(logWordCount ~ spam, data=emailSparse)
+
+train2 = subset(emailSparse, split==T)
+test2 = subset(emailSparse, split==F)
+
+# CART
+spam2CART = rpart(spam ~., data=train2)
+
+# RF 
+set.seed(123)
+spam2RF = randomForest(spam ~., data=train2)
+
+# predict 
+predTest2CART = predict(spam2CART, newdata=test2)[,2]
+tableTest2CART = table(test2$spam, predTest2CART > 0.5)
+sum(diag(1,2)*tableTest2CART)/sum(tableTest2CART)
+
+predTest2RF = predict(spam2RF, newdata=test2, type="prob")[,2]
+tableTest2RF= table(test2$spam, predTest2RF> 0.5)
+sum(diag(1,2)*tableTest2RF)/sum(tableTest2RF)
