@@ -23,6 +23,5 @@ plot(clustMovie)
 groupMovie = cutree(clustMovie, k=10)
 tapply(movies$Comedy, groupMovie, mean)
 
-colMeans(subset(movies[2:20], groupMovie==1))
 spl = split(movies[2:20], groupMovie)
-lapply(spl, colMeans)
+movieTable = do.call(rbind, lapply(spl, colMeans))
