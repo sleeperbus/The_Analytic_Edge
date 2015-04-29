@@ -1,0 +1,15 @@
+flower = read.csv("flower.csv", head=F)
+str(flower)
+flowerMatrix = as.matrix(flower)
+flowerVector = as.vector(flowerMatrix)
+image(flowerMatrix, axes = F, col=grey(seq(0,1,length=256)))
+
+distances = dist(flowerVector, method="euclidean")
+clust = hclust(distances, method="ward.D")
+plot(clust)
+rect.hclust(clust, k=3)
+groups = cutree(clust, k=3)
+tapply(flowerVector, groups, mean)
+
+dim(groups) = c(50, 50)
+image(groups, axes=F)
