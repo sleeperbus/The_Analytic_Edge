@@ -23,4 +23,16 @@ sumWithinss = sapply(2:10,
                      }
             )
 plot(2:10, sumWithinss, type="b")
-                    
+
+
+library(flexclust)
+tumor = read.csv("tumor.csv", header=FALSE)
+str(tumor)
+tumorMatrix = as.matrix(tumor)
+tumorVector = as.vector(tumorMatrix)
+image(tumorMatrix, axes=FALSE, col=grey(seq(0,1,length=256)))
+KMC.kcca = as.kcca(KMC, healthyVector)
+str(KMC.kcca)
+tumorPred = predict(KMC.kcca, newdata=tumorVector)
+dim(tumorPred) = c(nrow(tumor), ncol(tumor))
+image(tumorPred, axes=FALSE, col=rainbow(k))
