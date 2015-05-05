@@ -9,3 +9,12 @@ clusters = split(daily, groups)
 nrow(clusters[[3]])
 lapply(clusters, nrow)
 lapply(lapply(lapply(clusters, colMeans), sort), tail)
+
+# kmeans
+set.seed(1000)
+KMC = kmeans(daily, centers=7)
+kmcClusters = split(daily, KMC$cluster)
+lapply(kmcClusters, nrow)
+lapply(lapply(lapply(kmcClusters, colMeans), sort), tail)
+
+table(groups, KMC$cluster)
