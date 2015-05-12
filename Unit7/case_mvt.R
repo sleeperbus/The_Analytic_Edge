@@ -1,3 +1,4 @@
+library(ggplot2)
 mvt = read.csv("mvt.csv", stringsAsFactors=F)
 str(mvt)
 mvt$Date = strptime(mvt$Date, format="%m/%d/%y %H:%M")
@@ -10,18 +11,18 @@ str(weekdayCount)
 colnames(weekdayCount) = c("Day", "Freq")
 plot(weekdayCount$Day, weekdayCount$Freq)
 ggplot(weekdayCount, aes(x=Day, y=Freq)) + geom_point()
-ggplot(weekdayCount, aes(x=Day, y=Freq)) + geom_line(aes(group=Day)) + 
+ggplot(weekdayCount, aes(x=Day, y=Freq)) + geom_line(aes(group=1)) + 
     xlab("Day of the week") + ylab("Total motor vehicle Thefts")
 
 dayHourCount = as.data.frame(table(mvt$Weekday, mvt$Hour))
 str(dayHourCount)
 dayHourCount$Var2 = as.numeric(as.character(dayHourCount$Var2))
+dayHourCount$Type = ifelse(dayHourCount$Var1 %in% c("Sunday", "Saturday"),
+                            "Weekend", "Weekday")
 names(dayHourCount) = c("Day", "Hour", "Freq", "Type")
 ggplot(dayHourCount, aes(x=Hour, y=Freq)) + 
     geom_line(aes(color=Day), size=2, alpha=0.5) +
     xlab("Hour") + ylab("Freq")
-dayHourCount$Type = ifelse(dayHourCount$Var1 %in% c("Sunday", "Saturday"),
-                            "Weekend", "Weekday")
 ggplot(dayHourCount, aes(x=Hour, y=Freq)) + 
     geom_line(aes(gruop=Day, color=Type), size=2, alpha=0.5) 
 
