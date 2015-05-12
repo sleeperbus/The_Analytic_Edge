@@ -1,4 +1,5 @@
 library(ggplot2)
+library(ggmap)
 
 intl = read.csv("intl.csv")
 str(intl)
