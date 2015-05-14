@@ -24,7 +24,9 @@ tail(intlall)
 mapData = map_data("world")
 str(mapData)
 ggplot(mapData, aes(x=long, y=lat, group=group)) + 
-    geom_polygon(fill="white", color="black")
+    geom_polygon(fill="white", color="black") +
+    coord_map("mercator")
+
 geoData = merge(mapData, intlall, by.x="region", by.y="Citizenship")
 str(geoData)
 
@@ -36,4 +38,18 @@ head(geoData)
 geoData = geoData[with(geoData, order(group, order)), ]
 ggplot(geoData, aes(x=long, y=lat, group=group)) + 
     geom_polygon(fill="white", color="black") + 
-    coord_map("mercator")
+    coord_map("ortho", orientation=c(20,30,0))
+
+intlall$Citizenship[intlall$Citizenship=="China (People's Republic Of)"] = "China"
+
+library(ggplot2)
+library(reshape)
+
+household = read.csv("households.csv")
+str(household)
+household[,1:2]
+head(melt(household, id="Year"))
+melt(household, id="Year")[1:10,3]
+
+ggplot(data=melt(household, id="Year"), aes(x=Year, y=value, color=variable)) +
+    geom_line() + geom_point(size=5)
