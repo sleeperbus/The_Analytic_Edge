@@ -37,4 +37,7 @@ ggplot(data=parole, aes(x=time.served)) +
     geom_histogram(binwidth=1) +
     facet_grid(crime ~ .)
 
+ggplot(data=parole, aes(x=time.served, fill=crime, position="identity")) + 
+    geom_histogram(binwidth=1, alpha=0.5)
+
 
