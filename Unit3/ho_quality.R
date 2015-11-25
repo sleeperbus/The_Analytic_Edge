@@ -1,5 +1,7 @@
 library(caTools)
 library(corrplot)
+library(ROCR)
+
 
 quality = read.csv("quality.csv", stringsAsFactors = F)
 str(quality)
@@ -36,9 +38,14 @@ table(train$PoorCare, logM$fitted.values > 0.8)
 sensitivity = 2/25
 specificity = 73/74
 
-table(train$PoorCare, logM$fitted.values > 0.3)
+table(train$PoorCare, logM$fitted.values > 1.3)
 sensitivity = 13/25
 specificity = 67/74
+
+# ROCR 패키지를 사용해서 threshold 를 찾아봅시다.
+ROCRpred = prediction(logM$fitted.values, train$PoorCare)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+plot(ROCRperf, colorize=T, print.cutoffs.at=seq(0, 1, 0.1), text.adj=c(-0.2, 1))
 
 
 
