@@ -1,0 +1,10 @@
+baseball = read.csv("baseball.csv")
+str(baseball)
+length(table(baseball$Year))
+baseball = subset(baseball, Playoffs == 1)
+playoffTable = table(baseball$Year)
+names(playoffTable)
+baseball$NumCompetitors = playoffTable[as.character(baseball$Year)]
+nrow(subset(baseball, NumCompetitors == 8))
+baseball$WorldSeries = as.numeric(baseball$RankPlayoffs == 1)
+sum(baseball$WorldSeries == 0)
