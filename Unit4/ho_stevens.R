@@ -18,3 +18,43 @@ form = Reverse ~ Term + Circuit + Issue + Petitioner + Respondent + LowerCourt +
 # logistic regression 으로...
 modLog = glm(form, data=train, family=binomial)
 summary(modLog)
+# AIC = 523.17, 중요하지 않은 변수를 줄여보자.
+form2 = Reverse ~ Circuit + Respondent + LowerCourt
+modLog2 = glm(form2, data=train, family=binomial)
+summary(modLog2)
+# AIC = 505.02 로 조금 줄었다. 그렇다면 이걸 사용해서 test set 을 검증하자.
+predTestLog = predict(modLog2, newdata=test, type="response")
+table(test$Reverse, predTestLog > 0.5)
+accuracyLog = (45+65)/(45+32+28+65)
+# logistic model 의 정확도는 0.64 정도로 baseline 보다는 낫다. 
+
+# 이제 CART 모델을 사용해보자. 
+library(rpart)
+library(rpart.plot)
+formTree = Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst
+modCART = rpart(formTree, data=train, method="class", minbucket=25)
+summary(modCART)
+prp(modCART)
+# CART 를 사용해서 결과값을 예측해봅시다.
+predTestCART = predict(modCART, newdata=test, type="class")
+table(test$Reverse, predTestCART)
+accuracyCART = (40+78)/(40+37+15+78)
+# higher than log model
+library(ROCR)
+predROC_CART = predict(modCART, newdata=test)
+predictionCART = prediction(predROC_CART[, 2], test$Reverse)
+performanceCART = performance(predictionCART, "tpr", "fpr")
+plot(performanceCART, colorize=TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj=c(0.5, -0.5))
+aucCART = as.numeric(performance(predictionCART, "auc")@y.values)
+
+library(randomForest)
+train$Reverse = as.factor(train$Reverse)
+test$Reverse = as.factor(train$Reverse)
+modForest = randomForest(formTree, data=train, nodesize=25, ntree=200)
+summary(modForest)
+predTestForest = predict(modForest, newdata=test)
+table(test$Reverse, predTestForest)
+accuracyForest = (44+76)/(44+33+17+76)
+
+library(caret)
+library(e1071)
