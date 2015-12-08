@@ -42,7 +42,79 @@ summary(logMod1)
 
 #### Test Set 검증
 ```{r} 
-logPred = predict(logMod1, newdata=test)
+logPred1 = predict(logMod1, newdata=test)
+logTbl1 = table(test$Reverse, logPred1 > 0.5)
+logTbl1
+logAccu1 = (logTbl1[1,1] + logTbl1[2,2])/sum(logTbl1)
+logAccu1
+```
+test set 의 정확도는 0.59 정도이다. 어쨌든 baseline 보다는 높다.  
+
+### CART Model 
+#### Model 만들기 
+```{r}
+library(rpart)
+library(rpart.plot)
+cartMod = rpart(Reverse ~ ., data=train, method="class", minbucket=25)
+prp(cartMod)
+```
+대충 이런 결과가 나온다. 이 결과로 test set 을 검증해보자.  
+
+#### Test Set 검증 
+```{r}
+cartPred = predict(cartMod, newdata=test, type="class")
+cartTbl = table(test$Reverse, cartPred)
+cartTbl
+cartAccu = (cartTbl[1,1] + cartTbl[2,2])/sum(cartTbl)
+cartAccu
+```
+CART 모델의 정확도는 0.64 정도다. Logistic regression model 보다 낫다. 
+
+### Random Forest  
+#### Model 만들기 
+```{r}
+library(randomForest)
+rfMod = randomForest(Reverse ~ ., data=train, nodesize=25, ntree=200)
+```
+데이터 셋의 Rerverse 값이 factor 가 아니기 때문에 factor 로 변환 후 다시 실행한다.  
+```{r}
+train$Reverse = as.factor(train$Reverse)
+test$Reverse = as.factor(test$Reverse)
+rfMod = randomForest(Reverse ~ ., data=train, nodesize=25, ntree=200)
+```
+#### Test Set 검증  
+```{r}
+rfPred = predict(rfMod, newdata=test)
+rfTbl = table(test$Reverse, rfPred)
+rfTbl
+rfAccu = (rfTbl[1,1] + rfTbl[2,2])/sum(rfTbl)
+rfAccu
+```
+Random Forest 모델의 정확도는 CART 모델과 비슷한 정도이다. 혹시나 minbucket size 때문에 그럴수도 있으므로 이 값을 조정하기 위해 cross validation 을 시도해보자.  
+
+### cp 값을 결정하기 위한 cross validation  
+#### K fold  
+```{r}
+library(caret)
+library(e1071)
+trCtrl = trainControl(method="cv", number=10)
+cpGrid = expand.grid(.cp=seq(0.001, 0.3, 0.001))
+cvMod = train(Reverse ~ ., data=train, method="rpart", trControl=trCtrl, tuneGrid=cpGrid)
+cvMod$bestTune
+```
+이 모델로 생성된 CART 모델을 살펴보자. 
+```{r}
+prp(cvMod$finalModel)
+```
+아주 간단하게 LowerCourt 여부만 가지고 결정을 하는 거을 알 수 있다. 그렇다면 이 모델로 예측을 해보자. 
+
+#### Test Set 검증  
+```{r}
+cvPred = predict(cvMod$finalModel, newdata=test)
+cvTbl = table(test$Reverse, cvPred)
+cvTbl
+cvAccu = (cvTbl[1,1] + cvTbl[2,2])/sum(cvTbl)
+cvAccu
 ```
 
 
