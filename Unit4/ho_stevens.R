@@ -53,8 +53,18 @@ test$Reverse = as.factor(train$Reverse)
 modForest = randomForest(formTree, data=train, nodesize=25, ntree=200)
 summary(modForest)
 predTestForest = predict(modForest, newdata=test)
-table(test$Reverse, predTestForest)
-accuracyForest = (44+76)/(44+33+17+76)
+tblForest = table(test$Reverse, predTestForest)
+aacuracyForest = (tblForest[1, 1] + tblForest[2, 2])/sum(tblForest)
 
+# cross validation 을 사용해서 cp 를 찾자.
 library(caret)
 library(e1071)
+trControl = trainControl(method="cv", number=10)
+cpGrid = expand.grid(.cp=seq(0.01, 0.5, 0.01))
+cvModel = train(formTree, data=train, method="rpart", trControl=trControl, tuneGrid=cpGrid)
+# best cp 는 0.17
+
+modCART2 = rpart(formTree, data=train, method="class", cp=0.17)
+summary(modCART2)
+prp(modCART2)
+
