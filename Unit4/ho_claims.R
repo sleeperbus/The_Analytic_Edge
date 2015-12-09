@@ -22,9 +22,35 @@ penaltyBase = sum(as.matrix(tblBase) * penaltyMat) / nrow(claims)
 
 library(caTools)
 set.seed(88)
-split = sample.split(claims$bucket2009, SplitRatio = 0.7)
+split = sample.split(claims$bucket2009, SplitRatio = 0.6)
 train = subset(claims, split == TRUE)
 test = subset(claims, split == FALSE)
 
 # CART model 
-modCART = rpart
+library(rpart)
+library(rpart.plot)
+modCART = rpart(bucket2009 ~ age + alzheimers + arthritis + cancer + copd + 
+                  depression + diabetes + heart.failure + ihd + kidney + 
+                  osteoporosis + stroke + bucket2008 + reimbursement2008, 
+                data=train, method="class", cp=0.00005)
+prp(modCART)
+# 엄청나게 큰 트리가 나온다. 결과값이나 봅시다. 
+predCART = predict(modCART, newdata=test, type="class")  
+tblCART = table(test$bucket2009, predCART)
+tblCART
+accuCART = sum(tblCART * diag(1,5))/sum(tblCART)
+penaltyCART = sum(as.matrix(tblCART) * penaltyMat)/nrow(test)
+# penaltyCART 가 penaltyBase 보다 크게 나온다. modCART 를 만들 때 penalty 를 고려하지
+# 않고 만들었기 때문이다. 
+modCART2 = rpart(bucket2009 ~ age + alzheimers + arthritis + cancer + copd + 
+                  depression + diabetes + heart.failure + ihd + kidney + 
+                  osteoporosis + stroke + bucket2008 + reimbursement2008, 
+                data=train, method="class", cp=0.00005, 
+                parms=list(loss=penaltyMat))
+predCART2 = predict(modCART2, newdata=test, type="class")  
+tblCART2 = table(test$bucket2009, predCART2)
+tblCART2
+accuCART2 = sum(tblCART2 * diag(1,5))/sum(tblCART2)
+penaltyCART2 = sum(as.matrix(tblCART2) * penaltyMat)/nrow(test)
+# 이렇게 되면 penalty 는 떨어지지만 정확도도 떨어져버린다. 
+
