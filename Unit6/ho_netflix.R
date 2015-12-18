@@ -1,0 +1,17 @@
+movies = read.delim("movieLens.txt", header=FALSE, sep="|", quote = "\"", stringsAsFactors = FALSE)
+str(movies)
+head(movies$V4)
+tail(movies$V4)
+colnames(movies) = c("ID", "Title", "ReleaseDate", "VideoReleaseDate", "IMDB", "Unknown", "Action", "Adventure", "Animation", "Childrens", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "FilmNoir", "Horror", "Musical", "Mystery", "Romance", "SciFi", "Thriller", "War", "Western")
+str(movies)
+movies = movies[, c(-1, -3, -4, -5)]
+str(movies) 
+movies = unique(movies)
+str(movies)
+
+distMovie = dist(movies[, 2:20], method="euclidean")
+str(distMovie)
+hMovie = hclust(distMovie, method="ward.D")
+plot(hMovie)
+rect.hclust(hMovie, k = 10, border="red")
+rect.hclust(hMovie, k = 11, border="blue")
